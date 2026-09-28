@@ -649,7 +649,7 @@ main{padding:36px 0 70px}
 @media(max-width:560px){.wrap{width:calc(100% - 30px)}.nav{grid-template-columns:1fr;align-items:center;gap:8px;padding:12px 0}.brand{font-size:25px!important;min-width:0!important;text-align:center}.tabs{flex-direction:row;justify-content:center;gap:9px}.tabs .tab-btn{font-size:11px;padding:8px 3px}.language-control select{max-width:100px;font-size:11px;padding:7px 6px}.hero{height:230px}.hero-copy{left:18px;right:18px}.hero-copy h1{font-size:38px!important}.hero-copy small{font-size:11px}.hero-copy .sub{font-size:11px}main{padding:25px 0 55px}.section-intro h2{font-size:30px}.fields,.fields.three{grid-template-columns:1fr;gap:15px}.actions{flex-direction:column-reverse}.actions button{width:100%}.result-rows{grid-template-columns:repeat(2,minmax(0,1fr))}.result-row:nth-child(n){border-right:1px solid var(--line)}.result-row:nth-child(2n){border-right:0}.result-actions{display:grid;grid-template-columns:1fr 1fr}.result-actions button{width:100%;padding:10px}.history-item-details{grid-template-columns:repeat(2,1fr)}.history-actions{display:grid;grid-template-columns:1fr 1fr}.history-actions button{width:100%}.footer-inner{grid-template-columns:1fr 1fr}.footer-brand,.footer-copy{grid-column:1/-1}}
 @media(max-width:380px){.nav{grid-template-columns:1fr}.brand{text-align:center}.tabs{justify-content:center}.result-rows{grid-template-columns:1fr}.result-row:nth-child(n){border-right:0}}
 </style>
-<link rel="stylesheet" href="electricity-features.css?v=20260928-2">
+<link rel="stylesheet" href="electricity-features.css?v=20260928-3">
 <style>
 html.embedded header{position:static;box-shadow:none;border-bottom:1px solid #e1e0d8}
 html.embedded header .brand,html.embedded header .nav-links,html.embedded .hero,html.embedded footer,html.embedded .install-banner{display:none!important}
@@ -674,7 +674,8 @@ html.embedded .wrap{width:min(100% - 32px,1180px)}
   </div>
   <div class="tabs">
     <label class="language-control"><span class="sr-only">Language / Idioma</span><select id="languageSelect" aria-label="Language / Idioma"><option value="es">Español</option><option value="en">English</option></select></label>
-    <button class="tab-btn active" onclick="showPage('calculator',this)">Calculator</button>
+    <button class="tab-btn active" id="overviewTab" onclick="showPage('overview',this)">Resumen</button>
+    <button class="tab-btn" onclick="showPage('calculator',this)">Calculator</button>
     <button class="tab-btn" onclick="showPage('history',this)">History</button>
   </div>
 </div>
@@ -689,7 +690,32 @@ html.embedded .wrap{width:min(100% - 32px,1180px)}
   </div>
 </section>
 
-<div class="page active" id="page-calculator">
+<div class="page active" id="page-overview">
+<main><div class="wrap">
+  <div class="section-intro"><small>MONTE CARLO · ELECTRICIDAD</small><h2 id="overviewTitle">Resumen de electricidad</h2><p id="overviewSubtitle">Facturas y tareas del período.</p></div>
+  <div class="electric-overview-top">
+    <label><span id="overviewMonthLabel">Mes</span><input id="overviewMonth" type="month"></label>
+    <button type="button" class="btn-primary" id="overviewNew">+ Nuevo cobro</button>
+  </div>
+  <div class="electric-overview-cards" id="overviewCards"></div>
+  <section class="electric-overview-panel">
+    <div class="electric-panel-head"><div><h3 id="overviewTasksTitle">Por atender</h3><p id="overviewTasksHint"></p></div><button type="button" class="btn-secondary" id="overviewHistory">Ver historial</button></div>
+    <div id="overviewTasks"></div>
+  </section>
+  <section class="electric-overview-panel" id="monthlyClosePanel">
+    <div class="electric-panel-head"><div><h3 id="closeTitle">Cierre mensual</h3><p id="closeHint"></p></div><button type="button" class="btn-secondary" id="closeMonthButton"></button></div>
+    <p id="closeStatus" role="status"></p>
+  </section>
+  <details class="invoice-settings"><summary id="invoiceSettingsTitle">Diseño y datos de la factura PDF</summary>
+    <div class="invoice-settings-grid">
+      <label><span id="billingContactLabel">Contacto de cobros</span><input type="text" id="billingContact" maxlength="120" autocomplete="off"></label>
+      <label class="full"><span id="paymentInstructionsLabel">Instrucciones de pago</span><textarea id="paymentInstructions" maxlength="400" rows="3"></textarea></label>
+    </div><p id="invoiceSettingsHint"></p>
+  </details>
+</div></main>
+</div>
+
+<div class="page" id="page-calculator">
 <main><div class="wrap">
 
 <div class="install-banner" id="installBanner">
@@ -877,6 +903,7 @@ function buildCurrentRecord(){
 function printFromHistory(id){var r=getHistory().find(h=>h.id===id);if(r)generatePrint(r,'','')}
 function printInvoice(){var r=buildCurrentRecord();if(!r){alert('Please calculate first.');return}generatePrint(r,document.getElementById('preparedName').value.trim(),document.getElementById('preparedTitle').value.trim())}
 function generatePrint(r,preparedName,preparedTitle){
+  if(r.workflow==="draft"){alert(invoiceText("Issue the draft before printing.","Emití el borrador antes de imprimir."));return}
   var nights=0;
   if(r.checkIn&&r.checkOut)nights=Math.round((new Date(r.checkOut)-new Date(r.checkIn))/(1000*60*60*24));
   var dailyAvg=nights>0?(r.consumption/nights).toFixed(2):'—';
@@ -926,8 +953,8 @@ function activateCalculator(){
   showPage('calculator',btn);
 }
 function goHome(){
-  activateCalculator();
-  setTimeout(function(){scrollToSection('home')},80);
+  showPage('overview',document.getElementById('overviewTab'));
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function goBilling(){
   activateCalculator();
@@ -938,7 +965,7 @@ function goRates(){
   setTimeout(function(){scrollToSection('rates')},80);
 }
 function goHistory(){
-  var btn=document.querySelectorAll('.tab-btn')[1];
+  var btn=document.querySelector('.tab-btn[onclick*="history"]');
   showPage('history',btn);
   setTimeout(function(){window.scrollTo({top:0,behavior:'smooth'})},50);
 }
@@ -955,6 +982,7 @@ function pdfSafeName(value){
 }
 
 function buildInvoicePDF(r, preparedName, preparedTitle){
+  if(r.workflow==="draft"){alert(invoiceText("Issue the draft before downloading a PDF.","Emití el borrador antes de descargar el PDF."));return null;}
   if(!window.jspdf || !window.jspdf.jsPDF){
     alert(invoiceText('The PDF library could not be loaded. Please check the internet connection and try again.','No se pudo cargar la biblioteca de PDF. Revisá la conexión e intentá de nuevo.'));
     return null;
@@ -982,25 +1010,30 @@ function buildInvoicePDF(r, preparedName, preparedTitle){
     y += 20;
   }
 
-  doc.setFont("times","italic");
-  doc.setFontSize(28);
-  doc.text("Monte Carlo",left,y);
-  y += 26;
-
+  doc.setFillColor(247,245,239);
+  doc.rect(0,0,612,128,"F");
+  doc.setDrawColor(64,88,68);
+  doc.setLineWidth(1.4);
+  [[left,55,left+22,39,left+44,55],[left+44,55,left+66,39,left+88,55],[left+88,55,left+110,39,left+132,55]]
+    .forEach((roof)=>{doc.line(roof[0],roof[1],roof[2],roof[3]);doc.line(roof[2],roof[3],roof[4],roof[5]);});
+  doc.setTextColor(38,55,42);
+  doc.setFont("times","normal");
+  doc.setFontSize(23);
+  doc.text("MONTE CARLO",left,86);
   doc.setFont("helvetica","normal");
-  doc.setFontSize(11);
-  doc.text(invoiceText('ELECTRICITY BILLING','COBRO DE ELECTRICIDAD'),left,y);
-  y += 14;
-
+  doc.setFontSize(9);
+  doc.text(invoiceText("ELECTRICITY · CONDOMINIUMS","ELECTRICIDAD · CONDOMINIOS"),left,103);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(16);
+  doc.text(invoiceText("ELECTRICITY INVOICE","COBRO DE ELECTRICIDAD"),right,75,{align:"right"});
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  doc.text("Ref. "+String(r.id||"").slice(0,12).toUpperCase(),right,94,{align:"right"});
+  y=157;
   doc.setDrawColor(184,154,97);
   doc.setLineWidth(1);
   doc.line(left,y,right,y);
-  y += 30;
-
-  doc.setFont("times","normal");
-  doc.setFontSize(21);
-  doc.text(invoiceText('Electricity Invoice','Factura de electricidad'),left,y);
-  y += 30;
+  y+=26;
 
   row(invoiceText('Client','Cliente'),r.clientName || "-");
   row(invoiceText('Unit','Unidad'),"#" + (r.unitNumber || "-"));
@@ -1015,14 +1048,16 @@ function buildInvoicePDF(r, preparedName, preparedTitle){
   row(invoiceText('Exchange Rate','Tipo de cambio'),"CRC " + Number(r.exchangeRate || 0).toFixed(2) + " = USD 1");
 
   y += 10;
-  doc.setFillColor(245,242,235);
+  doc.setFillColor(64,88,68);
   doc.rect(left,y,right-left,68,"F");
+  doc.setTextColor(255,255,255);
   doc.setFont("helvetica","bold");
   doc.setFontSize(10);
   doc.text(invoiceText('TOTAL DUE','TOTAL A PAGAR'),left+16,y+23);
   doc.setFont("times","bold");
   doc.setFontSize(28);
   doc.text("$" + Number(r.totalUSD || 0).toFixed(2) + " USD",left+16,y+53);
+  doc.setTextColor(38,55,42);
   y += 98;
 
   if(preparedName || preparedTitle){
@@ -1041,11 +1076,20 @@ function buildInvoicePDF(r, preparedName, preparedTitle){
     }
   }
 
-  y += 20;
+  if(r.billingContact || r.paymentInstructions){
+    y+=18;
+    doc.setFont("helvetica","bold");doc.setFontSize(10);
+    doc.text(invoiceText("PAYMENT INFORMATION","INFORMACIÓN DE PAGO"),left,y);y+=18;
+    doc.setFont("helvetica","normal");doc.setFontSize(9);
+    if(r.billingContact){const lines=doc.splitTextToSize(String(r.billingContact),right-left);doc.text(lines,left,y);y+=lines.length*14;}
+    if(r.paymentInstructions){const lines=doc.splitTextToSize(String(r.paymentInstructions),right-left);doc.text(lines,left,y);y+=lines.length*14;}
+  }
+  if(y>710){doc.addPage();y=58;}
+  y+=18;
+  doc.setDrawColor(222,220,210);doc.line(left,y,right,y);y+=15;
   doc.setTextColor(110);
-  doc.setFont("helvetica","normal");
-  doc.setFontSize(8);
-  doc.text(invoiceText('Monte Carlo Condominiums - Electricity Billing','Condominios Monte Carlo - Cobro de electricidad'),left,y);
+  doc.setFont("helvetica","normal");doc.setFontSize(8);
+  doc.text(invoiceText('Monte Carlo Condominiums · Electricity Billing','Condominios Monte Carlo · Cobro de electricidad'),left,y);
 
   return doc;
 }
@@ -1087,10 +1131,10 @@ function downloadHistoryPDF(id){
 <script>
 const UI_TRANSLATIONS = [
   ['.nav-links button:nth-child(1)','Inicio'],['.nav-links button:nth-child(2)','Cobro'],['.nav-links button:nth-child(3)','Tarifas'],['.nav-links button:nth-child(4)','Historial'],
-  ['.tab-btn:nth-of-type(1)','Calculadora'],['.tab-btn:nth-of-type(2)','Historial'],
+  ['#overviewTab','Resumen'],['.tab-btn:nth-of-type(2)','Calculadora'],['.tab-btn:nth-of-type(3)','Historial'],
   ['.hero-copy small','Condominios Monte Carlo'],['.hero-copy h1','Cobro de<br>electricidad',true],['.hero-copy .sub','Calculadora de electricidad'],
   ['.install-banner p','Agregá esta página a la pantalla de inicio para acceder fácilmente.'],['#installBtn','Instalar'],
-  ['.section-intro small','CALCULADORA DE ELECTRICIDAD'],['.section-intro h2','Datos para el cobro'],
+  ['#page-calculator .section-intro small','CALCULADORA DE ELECTRICIDAD'],['#page-calculator .section-intro h2','Datos para el cobro'],
   ['.card:nth-child(1) h3','Datos del cliente'],['.card:nth-child(2) h3','Lecturas del medidor'],['.card:nth-child(3) h3','Tarifa y tipo de cambio'],['.card:nth-child(4) h3','Preparado por'],
   ['label[for="clientName"]','Nombre del cliente'],['label[for="unitNumber"]','Número de unidad'],['label[for="checkIn"]','Fecha de entrada'],['label[for="checkOut"]','Fecha de salida'],
   ['label[for="prevReading"]','Lectura de entrada (kWh)'],['label[for="currReading"]','Lectura de salida (kWh)'],['label[for="consumption"]','Consumo'],
@@ -1125,7 +1169,7 @@ let preferred='es';try{preferred=localStorage.getItem('mc_electricity_lang')||'e
 setLanguage(preferred);
 </script>
 <script src="electricity-xlsx.js?v=20260928-2"></script>
-<script src="electricity-features.js?v=20260928-2"></script>
+<script src="electricity-features.js?v=20260928-3"></script>
 <script src="electricity-config.js?v=20260928-2"></script>
 <script src="electricity-cloud.js?v=20260928-2"></script>
 <script>
