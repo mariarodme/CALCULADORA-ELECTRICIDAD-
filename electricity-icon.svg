@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Monte Carlo electricidad">
+<rect width="512" height="512" rx="92" fill="#405844"/>
+<path d="M105 241v-65l49-45 50 45v65m0-65 51-45 51 45v65m0-65 50-45 51 45v65" fill="none" stroke="#e8e4d7" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M275 266h-45l-30 72h50l-20 88 85-116h-52z" fill="#c9aa73"/>
+<path d="M131 376h79m105 0h66" stroke="#e8e4d7" stroke-width="7" stroke-linecap="round"/>
+</svg>
