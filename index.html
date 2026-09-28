@@ -650,6 +650,16 @@ main{padding:36px 0 70px}
 @media(max-width:380px){.nav{grid-template-columns:1fr}.brand{text-align:center}.tabs{justify-content:center}.result-rows{grid-template-columns:1fr}.result-row:nth-child(n){border-right:0}}
 </style>
 <link rel="stylesheet" href="electricity-features.css?v=20260928-2">
+<style>
+html.embedded header{position:static;box-shadow:none;border-bottom:1px solid #e1e0d8}
+html.embedded header .brand,html.embedded header .nav-links,html.embedded .hero,html.embedded footer,html.embedded .install-banner{display:none!important}
+html.embedded header .nav{min-height:0;display:flex;justify-content:flex-start;gap:0;padding:12px 0}
+html.embedded header .tabs{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:14px}
+html.embedded main{padding:28px 0 55px}
+html.embedded .wrap{width:min(100% - 32px,1180px)}
+@media(max-width:620px){html.embedded header .nav{padding:10px 0}html.embedded header .tabs{gap:9px}html.embedded header .tab-btn{font-size:13px;padding:8px 2px}}
+</style>
+<script>if(new URLSearchParams(location.search).get("embed")==="1")document.documentElement.classList.add("embedded");</script>
 </head>
 <body>
 
@@ -1118,5 +1128,22 @@ setLanguage(preferred);
 <script src="electricity-features.js?v=20260928-2"></script>
 <script src="electricity-config.js?v=20260928-2"></script>
 <script src="electricity-cloud.js?v=20260928-2"></script>
+<script>
+(function(){
+ if(!document.documentElement.classList.contains("embedded")||window.parent===window)return;
+ let previous=0;
+ function reportHeight(){
+   const height=Math.ceil(Math.max(document.body.scrollHeight,document.documentElement.scrollHeight));
+   if(height===previous)return;
+   previous=height;
+   window.parent.postMessage({type:"monte-carlo-electricity-height",height:height},location.origin);
+ }
+ new ResizeObserver(reportHeight).observe(document.body);
+ new MutationObserver(reportHeight).observe(document.body,{childList:true,subtree:true,attributes:true,characterData:true});
+ window.addEventListener("load",reportHeight);
+ window.addEventListener("resize",reportHeight);
+ reportHeight();
+})();
+</script>
 </body>
 </html>
