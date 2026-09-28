@@ -1,4 +1,4 @@
-const CACHE_NAME = "mc-electricity-v3";
+const CACHE_NAME = "mc-electricity-v4";
 const BASE = "/CALCULADORA-ELECTRICIDAD-";
 const ASSETS = [BASE + "/", BASE + "/index.html", BASE + "/manifest.json",
   BASE + "/electricity-icon.svg", BASE + "/monte_carlo_hero.png",
