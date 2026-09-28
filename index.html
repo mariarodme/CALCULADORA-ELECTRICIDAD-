@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="Electricity">
 <meta name="description" content="Electricity billing calculator for Monte Carlo Condominiums">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="electricity-icon.svg">
 <title>Electricity Billing — Monte Carlo Condominiums</title>
 <style>
 *{box-sizing:border-box}
@@ -648,6 +649,7 @@ main{padding:36px 0 70px}
 @media(max-width:560px){.wrap{width:calc(100% - 30px)}.nav{grid-template-columns:1fr;align-items:center;gap:8px;padding:12px 0}.brand{font-size:25px!important;min-width:0!important;text-align:center}.tabs{flex-direction:row;justify-content:center;gap:9px}.tabs .tab-btn{font-size:11px;padding:8px 3px}.language-control select{max-width:100px;font-size:11px;padding:7px 6px}.hero{height:230px}.hero-copy{left:18px;right:18px}.hero-copy h1{font-size:38px!important}.hero-copy small{font-size:11px}.hero-copy .sub{font-size:11px}main{padding:25px 0 55px}.section-intro h2{font-size:30px}.fields,.fields.three{grid-template-columns:1fr;gap:15px}.actions{flex-direction:column-reverse}.actions button{width:100%}.result-rows{grid-template-columns:repeat(2,minmax(0,1fr))}.result-row:nth-child(n){border-right:1px solid var(--line)}.result-row:nth-child(2n){border-right:0}.result-actions{display:grid;grid-template-columns:1fr 1fr}.result-actions button{width:100%;padding:10px}.history-item-details{grid-template-columns:repeat(2,1fr)}.history-actions{display:grid;grid-template-columns:1fr 1fr}.history-actions button{width:100%}.footer-inner{grid-template-columns:1fr 1fr}.footer-brand,.footer-copy{grid-column:1/-1}}
 @media(max-width:380px){.nav{grid-template-columns:1fr}.brand{text-align:center}.tabs{justify-content:center}.result-rows{grid-template-columns:1fr}.result-row:nth-child(n){border-right:0}}
 </style>
+<link rel="stylesheet" href="electricity-features.css?v=20260928-2">
 </head>
 <body>
 
@@ -1112,5 +1114,9 @@ document.getElementById('languageSelect').addEventListener('change',function(){s
 let preferred='es';try{preferred=localStorage.getItem('mc_electricity_lang')||'es'}catch(e){}
 setLanguage(preferred);
 </script>
+<script src="electricity-xlsx.js?v=20260928-2"></script>
+<script src="electricity-features.js?v=20260928-2"></script>
+<script src="electricity-config.js?v=20260928-2"></script>
+<script src="electricity-cloud.js?v=20260928-2"></script>
 </body>
 </html>
