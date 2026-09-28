@@ -1,0 +1,20 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid || data.child('sharingEnabled').val() === true",
+        ".write": "auth != null && auth.uid === $uid || data.child('sharingEnabled').val() === true && newData.child('sharingEnabled').val() === true",
+        ".validate": "newData.hasChildren(['revision', 'payloadText']) && newData.child('revision').isNumber() && newData.child('payloadText').isString()"
+      }
+    },
+    "electricity": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChild('revision') && newData.child('revision').isNumber()"
+      }
+    }
+  }
+}
