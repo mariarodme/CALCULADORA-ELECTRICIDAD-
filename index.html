@@ -653,6 +653,11 @@ main{padding:36px 0 70px}
 <style>
 html.embedded header{position:static;box-shadow:none;border-bottom:1px solid #e1e0d8}
 html.embedded header .brand,html.embedded header .nav-links,html.embedded .hero,html.embedded footer,html.embedded .install-banner{display:none!important}
+html.embedded header{background:#f7f5f0}
+html.embedded header .tab-btn{border:1px solid #cbd2c7;border-radius:22px;padding:9px 15px;background:#fffdfa;color:#3e5845;font-weight:700}
+html.embedded header .tab-btn.active{border-color:#405843;background:#405843;color:#fff}
+html.embedded #page-overview .section-intro{display:none}
+
 html.embedded header .nav{min-height:0;display:flex;justify-content:flex-start;gap:0;padding:12px 0}
 html.embedded header .tabs{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:14px}
 html.embedded main{padding:28px 0 55px}
@@ -1169,7 +1174,7 @@ let preferred='es';try{preferred=localStorage.getItem('mc_electricity_lang')||'e
 setLanguage(preferred);
 </script>
 <script src="electricity-xlsx.js?v=20260928-2"></script>
-<script src="electricity-features.js?v=20260929-1"></script>
+<script src="electricity-features.js?v=20260929-2"></script>
 <script src="electricity-config.js?v=20260928-2"></script>
 <script src="electricity-cloud.js?v=20260928-2"></script>
 <script>
