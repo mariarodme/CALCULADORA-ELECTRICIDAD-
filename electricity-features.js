@@ -415,8 +415,19 @@
       window.electricCloud?.change({kind:"upsert",record});
     }
   };
+  function publishForUnified() {
+    if (window.parent === window || new URLSearchParams(location.search).get("embed") !== "1") return;
+    const records = getHistory().map((r) => ({
+      id:String(r.id), clientName:String(r.clientName||""), unitNumber:String(r.unitNumber||""),
+      checkIn:String(r.checkIn||""), checkOut:String(r.checkOut||""),
+      workflow:r.workflow==="draft"?"draft":"issued", status:String(r.status||"pending"),
+      totalUSD:Number(r.totalUSD||0)
+    }));
+    window.parent.postMessage({type:"monte-carlo-electricity-records",records},location.origin);
+  }
   renderHistory = function () {
     const all = getHistory();
+    publishForUnified();
     const search = $("historySearch").value.trim().toLocaleLowerCase();
     const month = $("historyMonth").value;
     const status = $("historyStatus").value;
@@ -435,6 +446,7 @@
     }
     filtered.forEach((r) => {
       const article = document.createElement("article"); article.className = "history-item";
+      article.dataset.invoiceId=String(r.id);
       if (r.workflow === "draft") article.classList.add("is-draft");
       if (isClosed(monthOf(r))) article.classList.add("is-closed");
       const head = document.createElement("div"); head.className = "history-item-header";
@@ -529,5 +541,19 @@
           "¿Agregar las facturas de este dispositivo al historial en línea? Las facturas existentes permanecerán.")))
       cloud.importLocal(cloud.importable());
   };
+  window.addEventListener("message",(event)=>{
+    if(event.origin!==location.origin || event.source!==window.parent || !event.data)return;
+    if(event.data.type==="monte-carlo-electricity-request"){publishForUnified();return;}
+    if(event.data.type!=="monte-carlo-electricity-open")return;
+    const target=getHistory().find((r)=>String(r.id)===String(event.data.id));
+    $("historyMonth").value=target ? String(target.checkOut||target.checkIn||"").slice(0,7) : (event.data.month||"");
+    $("historySearch").value=target ? (target.clientName||target.unitNumber||"") : (event.data.search||"");
+    $("historyStatus").value="";
+    showPage("history",document.querySelector('.tab-btn[onclick*="history"]'));
+    renderHistory();
+    if(target) requestAnimationFrame(()=>document.querySelectorAll(".history-item").forEach((item)=>{
+      if(item.dataset.invoiceId===String(target.id))item.scrollIntoView({block:"center",behavior:"smooth"});
+    }));
+  });
   renderHistory();
 })();
