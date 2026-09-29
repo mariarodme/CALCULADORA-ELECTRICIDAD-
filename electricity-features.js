@@ -103,6 +103,14 @@
   function updateCloudControls() {
     const cloud = window.electricCloud;
     const signed = !!cloud?.uid;
+    $("historyStorage").textContent = cloud?.connected
+      ? tr("Online history is connected. Invoices saved here are available on your devices.",
+          "Historial conectado en línea. Las facturas que guardés aquí estarán disponibles en tus dispositivos.")
+      : signed
+        ? tr("Check the online connection status in Shared history below.",
+            "Revisá el estado de la conexión en Historial compartido, más abajo.")
+        : tr("History is saved only in this browser.",
+            "El historial se guarda solo en este navegador.");
     $("electricImport").textContent = cloud?.localPending
       ? tr("Sync pending changes", "Sincronizar cambios pendientes")
       : tr("Import this device's invoices", "Subir facturas de este dispositivo");
