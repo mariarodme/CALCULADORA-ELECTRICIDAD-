@@ -139,11 +139,7 @@
   $("billingContact").value = invoiceSettings().contact || "";
   $("paymentInstructions").value = invoiceSettings().instructions || "";
   $("overviewMonth").value = new Date().toISOString().slice(0,7);
-  $("overviewMonth").addEventListener("change",()=>{
-    renderOverview();
-    if(document.documentElement.classList.contains("embedded") && /^\d{4}-\d{2}$/.test($("overviewMonth").value))
-      window.parent.postMessage({type:"monte-carlo-electricity-period-changed",month:$("overviewMonth").value},location.origin);
-  });
+  $("overviewMonth").addEventListener("change",renderOverview);
   $("overviewNew").onclick = () => showPage("calculator",document.querySelector('.tab-btn[onclick*="calculator"]'));
   $("overviewHistory").onclick = () => showPage("history",document.querySelector('.tab-btn[onclick*="history"]'));
   localeUI();
@@ -555,16 +551,6 @@
   };
   window.addEventListener("message",(event)=>{
     if(event.origin!==location.origin || event.source!==window.parent || !event.data)return;
-    if(event.data.type==="monte-carlo-electricity-period"){
-      const month=String(event.data.month||"");
-      if(/^\d{4}-(0[1-9]|1[0-2])$/.test(month)){
-        $("overviewMonth").value=month;
-        $("historyMonth").value=month;
-        renderOverview();
-        renderHistory();
-      }
-      return;
-    }
     if(event.data.type==="monte-carlo-electricity-request"){publishForUnified();return;}
     if(event.data.type!=="monte-carlo-electricity-open")return;
     const target=getHistory().find((r)=>String(r.id)===String(event.data.id));
